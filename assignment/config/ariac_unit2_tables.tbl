@@ -1,6 +1,21 @@
 <?xml version="1.0" ?>
 <tables>
-    <table name = "unit2_table">
+    <table name = "conveyor_configuration">
+	    <logical_camera_4 name="logical_camera">
+		    <camera_topic value="/ariac/logical_camera_4" />
+		    <camera_frame value="logical_camera_4_frame" />
+	    </logical_camera_4>
+	    <break_beam_1 name="break_beam">
+		    <beam_topic value="/ariac/break_beam_1_change" />
+	    </break_beam_1>
+	    <laser_profiler_1 name="laser_profiler">
+		    <laser_topic value="/ariac/laser_profiler_1" />
+		    <laser_frame value="laser_profiler_1_frame" />
+	    </laser_profiler_1>
+	    <proximity_sensor_1 name="proximity_sensor">
+		    <proximity_topic value="/ariac/proximity_sensor_1" />
+		    <proximity_frame value="proximity_sensor_1_frame" />
+	    </proximity_sensor_1>
     </table>
     <table name = "andere_tabel_voor_unit2">
     </table>
