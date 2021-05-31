@@ -19,6 +19,7 @@ from ariac_flexbe_states.start_assignment_state import StartAssignment
 from ariac_flexbe_states.vacuum_gripper_control_state import VacuumGripperControlState
 from ariac_logistics_flexbe_states.get_material_locations import GetMaterialLocationsState
 from ariac_support_flexbe_states.get_item_from_list_state import GetItemFromListState
+from flexbe_states.wait_state import WaitState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -56,7 +57,7 @@ class pick_part_from_binSM(Behavior):
 		table = '/ariac_tables_unit1'
 		# x:30 y:365, x:437 y:159
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['part', 'robot_namespace'])
-		_state_machine.userdata.part = 'gasket_part'
+		_state_machine.userdata.part = ''
 		_state_machine.userdata.robot_namespace = ''
 		_state_machine.userdata.move_group = 'manipulator'
 		_state_machine.userdata.action_topic = '/move_group'
@@ -69,7 +70,7 @@ class pick_part_from_binSM(Behavior):
 		_state_machine.userdata.camera_frame = ''
 		_state_machine.userdata.camera_topic = ''
 		_state_machine.userdata.camera_ref_frame = 'arm1_linear_arm_actuator'
-		_state_machine.userdata.part_height = 0.035
+		_state_machine.userdata.part_height = 0.025
 		_state_machine.userdata.part_rotation = 0
 		_state_machine.userdata.tool_link = 'ee_link'
 		_state_machine.userdata.gripper_service = '/ariac/arm1/gripper/control'
@@ -178,10 +179,16 @@ class pick_part_from_binSM(Behavior):
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
 										remapping={'action_topic_namespace': 'action_topic_namespace', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
+			# x:356 y:620
+			OperatableStateMachine.add('Wait',
+										WaitState(wait_time=1),
+										transitions={'done': 'Move Home'},
+										autonomy={'done': Autonomy.Off})
+
 			# x:265 y:518
 			OperatableStateMachine.add('ActivateGripper',
 										VacuumGripperControlState(enable=True),
-										transitions={'continue': 'Move Home', 'failed': 'failed'},
+										transitions={'continue': 'Wait', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'service_name': 'gripper_service'})
 
