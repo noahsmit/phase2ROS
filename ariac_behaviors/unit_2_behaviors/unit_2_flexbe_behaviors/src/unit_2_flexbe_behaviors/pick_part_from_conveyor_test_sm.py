@@ -10,6 +10,7 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_flexbe_states.message_state import MessageState
 from unit_2_flexbe_behaviors.pick_part_from_conveyor_sm import pick_part_from_conveyorSM
+from unit_2_flexbe_behaviors.transport_conveyor_to_pick_location_sm import transport_conveyor_to_pick_locationSM
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -34,6 +35,7 @@ class pick_part_from_conveyor_testSM(Behavior):
 
 		# references to used behaviors
 		self.add_behavior(pick_part_from_conveyorSM, 'pick_part_from_conveyor')
+		self.add_behavior(transport_conveyor_to_pick_locationSM, 'transport_conveyor_to_pick_location')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -45,7 +47,7 @@ class pick_part_from_conveyor_testSM(Behavior):
 
 
 	def create(self):
-		# x:649 y:56, x:174 y:207
+		# x:1008 y:106, x:174 y:207
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.part = ''
 		_state_machine.userdata.robot_namespace = '/ariac/arm1'
@@ -57,14 +59,20 @@ class pick_part_from_conveyor_testSM(Behavior):
 
 
 		with _state_machine:
-			# x:113 y:43
+			# x:118 y:49
+			OperatableStateMachine.add('transport_conveyor_to_pick_location',
+										self.use_behavior(transport_conveyor_to_pick_locationSM, 'transport_conveyor_to_pick_location'),
+										transitions={'finished': 'pick_part_from_conveyor', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:516 y:43
 			OperatableStateMachine.add('pick_part_from_conveyor',
 										self.use_behavior(pick_part_from_conveyorSM, 'pick_part_from_conveyor'),
 										transitions={'finished': 'PartMessage', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
 										remapping={'robot_namespace': 'robot_namespace', 'part': 'part'})
 
-			# x:385 y:51
+			# x:798 y:53
 			OperatableStateMachine.add('PartMessage',
 										MessageState(),
 										transitions={'continue': 'finished'},
