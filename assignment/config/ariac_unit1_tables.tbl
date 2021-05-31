@@ -1,7 +1,53 @@
 <?xml version="1.0" ?>
 <tables>
-    <table name = "unit1_table">
+    <table name = "bin_configuration">
+	    <bin name="bin1">
+		    <robot2_config value="bin1PreDropPickR2" />
+		    <robot1_config value="x" />
+		    <camera_topic value="/ariac/logical_camera_1" />
+		    <camera_frame value="logical_camera_1_frame" />
+	    </bin>
+	    <bin name="bin2">
+		    <robot2_config value="bin2PreDropPickR2" />
+		    <robot1_config value="x" />
+		    <camera_topic value="/ariac/logical_camera_2" />
+		    <camera_frame value="logical_camera_2_frame" />
+	    </bin>
+	    <bin name="bin3">
+		    <robot2_config value="bin3PreDropPickR2" />
+		    <robot1_config value="bin3PreDropPickR1" />
+		    <camera_topic value="/ariac/logical_camera_3" />
+		    <camera_frame value="logical_camera_3_frame" />
+	    </bin>
+	    <bin name="bin4">
+		    <robot2_config value="bin4PreDropPickR2" />
+		    <robot1_config value="bin4PreDropPickR1" />
+		    <camera_topic value="/ariac/logical_camera_4" />
+		    <camera_frame value="logical_camera_4_frame" />
+	    </bin>
+	    <bin name="bin5">
+		    <robot2_config value="X" />
+		    <robot1_config value="bin5PreDropPickR1" />
+		    <camera_topic value="/ariac/logical_camera_5" />
+		    <camera_frame value="logical_camera_5_frame" />
+	    </bin>
+	    <bin name="bin6">
+		    <robot2_config value="x" />
+		    <robot1_config value="bin6PreDropPickR1" />
+		    <camera_topic value="/ariac/logical_camera_6" />
+		    <camera_frame value="logical_camera_6_frame" />
+	    </bin>
     </table>
-    <table name = "andere_tabel_voor_unit1">
+
+    <table name = "parts_bin">
+	    <part name="piston_rod_part">
+		    <bin value="bin3" />
+	    </part>
+	    <part name="gear_part">
+		    <bin value="bin4" />
+	    </part>
+	    <part name="gasket_part">
+		    <bin value="bin5" />
+	    </part>
     </table>
 </tables>

@@ -8,8 +8,8 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from ariac_support_flexbe_states.add_numeric_state import AddNumericState
 from ariac_flexbe_states.message_state import MessageState
+from ariac_support_flexbe_states.add_numeric_state import AddNumericState
 from ariac_support_flexbe_states.greater_numeric_state import GreaterNumericState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
@@ -66,19 +66,19 @@ class loop_exampleSM(Behavior):
 										autonomy={'done': Autonomy.Off},
 										remapping={'value_a': 'one_value', 'value_b': 'iteration', 'result': 'iteration'})
 
-			# x:348 y:202
-			OperatableStateMachine.add('Message',
-										MessageState(),
-										transitions={'continue': 'Add'},
-										autonomy={'continue': Autonomy.Off},
-										remapping={'message': 'iteration'})
-
 			# x:345 y:46
 			OperatableStateMachine.add('Compare',
 										GreaterNumericState(),
 										transitions={'true': 'finished', 'false': 'Message'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'iteration', 'value_b': 'number_of_interations'})
+
+			# x:348 y:202
+			OperatableStateMachine.add('Message',
+										MessageState(),
+										transitions={'continue': 'Add'},
+										autonomy={'continue': Autonomy.Off},
+										remapping={'message': 'iteration'})
 
 
 		return _state_machine
