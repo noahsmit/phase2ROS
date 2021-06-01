@@ -42,12 +42,32 @@
     <table name = "parts_bin">
 	    <part name="piston_rod_part">
 		    <bin value="bin3" />
+		    <height value="0.017" />
 	    </part>
 	    <part name="gear_part">
 		    <bin value="bin4" />
+		    <height value="0.025" />
 	    </part>
 	    <part name="gasket_part">
 		    <bin value="bin5" />
+		    <height value="0.038" />
 	    </part>
     </table>
+    <table name = "robots">
+	    <robot name="robot1_config">
+		    <namespace value="/ariac/arm1" />
+		    <service value='/ariac/arm1/gripper/control' />
+		    <camera value='arm1_linear_arm_actuator' />
+		    <config value='tray1PreDropR1' />
+		    <tray value='kit_tray_1' />
+	    </robot>
+	    <robot name="robot2_config">
+		    <namespace value="/ariac/arm2" />
+		    <service value='/ariac/arm2/gripper/control' />
+		    <camera value='arm2_linear_arm_actuator' />
+		    <config value='tray2PreDropR2' />
+		    <tray value='kit_tray_2' />
+	    </robot>
+    </table>
+
 </tables>
