@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="lege_bins_zoeken">
+
+	<executable package_path="unit_2_flexbe_behaviors.lege_bins_zoeken_sm" class="lege_bins_zoekenSM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Mon May 31 2021</date>
+	<description>
+		checkt alle bins om te kijken of er producten liggen.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

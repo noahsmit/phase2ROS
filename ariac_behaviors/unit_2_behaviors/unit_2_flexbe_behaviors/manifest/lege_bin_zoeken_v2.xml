@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="lege_bin_zoeken_V2">
+
+	<executable package_path="unit_2_flexbe_behaviors.lege_bin_zoeken_v2_sm" class="lege_bin_zoeken_V2SM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Tue Jun 01 2021</date>
+	<description>
+		zoekt naar de volle bins om vandaaruit de lege bins te vinden.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

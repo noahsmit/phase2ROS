@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="place_part_on_bin">
+
+	<executable package_path="ariac_flexbe_example_behaviors.place_part_on_bin_sm" class="place_part_on_binSM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Mon May 31 2021</date>
+	<description>
+		places the part it picked up from the conveyor in an empty bin or in a bin with the same type of products.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

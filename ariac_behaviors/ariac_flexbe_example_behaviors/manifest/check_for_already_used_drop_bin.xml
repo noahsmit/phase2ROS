@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="check_for_already_used_drop_bin">
+
+	<executable package_path="ariac_flexbe_example_behaviors.check_for_already_used_drop_bin_sm" class="check_for_already_used_drop_binSM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Tue Jun 01 2021</date>
+	<description>
+		checks if there are bins witch are not empty 
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

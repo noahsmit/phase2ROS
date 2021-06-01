@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="If_statements_piston_rod_part">
+
+	<executable package_path="unit_2_flexbe_behaviors.if_statements_piston_rod_part_sm" class="If_statements_piston_rod_partSM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Tue Jun 01 2021</date>
+	<description>
+		looks for empty spots on the bin
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

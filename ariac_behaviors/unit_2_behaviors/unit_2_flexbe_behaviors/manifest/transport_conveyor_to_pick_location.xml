@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="transport_conveyor_to_pick_location">
+
+	<executable package_path="unit_2_flexbe_behaviors.transport_conveyor_to_pick_location_sm" class="transport_conveyor_to_pick_locationSM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Wed May 26 2021</date>
+	<description>
+		Flexbe behavior for switching on the conveyor and stop it when the breakbeam has detected a part.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>
