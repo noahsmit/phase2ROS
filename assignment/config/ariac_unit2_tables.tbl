@@ -46,4 +46,24 @@
 		    <gripper_status_topic value="/ariac/arm2/gripper/state" />
 	    </piston_rod_part>
     </table>
+    <table name = "bin_names">
+	    <bin name="bin1">
+		    <bin_name value="bin1" />
+	    </bin>
+	    <bin name="bin2">
+		    <bin_name value="bin2" />
+	    </bin>
+	    <bin name="bin3">
+		    <bin_name value="bin3" />
+	    </bin>
+	    <bin name="bin4">
+		    <bin_name value="bin4" />
+	    </bin>
+	    <bin name="bin5">
+		    <bin_name value="bin5" />
+	    </bin>
+	    <bin name="bin6">
+		    <bin_name value="bin6" />
+	    </bin>
+    </table>
 </tables>
