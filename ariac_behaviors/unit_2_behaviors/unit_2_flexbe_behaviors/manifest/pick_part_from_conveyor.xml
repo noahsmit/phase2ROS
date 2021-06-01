@@ -12,6 +12,7 @@
 
 
 	<!-- Contained Behaviors -->
+	<contains name="lege_bin_zoeken_V2" />
 
 	<!-- Available Parameters -->
 

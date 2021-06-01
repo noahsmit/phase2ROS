@@ -66,4 +66,59 @@
 		    <bin_name value="bin6" />
 	    </bin>
     </table>
+    <table name="bin_configuration">
+        <bin name="bin1">
+            <robot_config value="bin1PreDropPickR2"/>
+            <camera_topic value="/ariac/logical_camera_1"/>
+            <camera_frame value="logical_camera_1_frame"/>
+            <robot_number value="/ariac/arm2"/>
+            <robot_positie value="ConveyorPreGraspR2"/>
+        </bin>
+        <bin name="bin2">
+            <robot_config value="bin2PreDropPickR2"/>
+            <camera_topic value="/ariac/logical_camera_2"/>
+            <camera_frame value="logical_camera_2_frame"/>
+      	    <robot_number value="/ariac/arm2"/>
+      	    <robot_positie value="ConveyorPreGraspR2"/>
+        </bin>
+        <bin name="bin3">
+            <robot_config value="bin3PreDropPickR2"/>
+            <camera_topic value="/ariac/logical_camera_3"/>
+            <camera_frame value="logical_camera_3_frame"/>
+            <robot_number value="/ariac/arm2"/>
+            <robot_positie value="ConveyorPreGraspR2"/>
+        </bin>
+        <bin name="bin4">
+            <robot_config value="bin4PreDropPickR1"/>
+            <camera_topic value="/ariac/logical_camera_4"/>
+            <camera_frame value="logical_camera_4_frame"/>
+            <robot_number value="/ariac/arm1"/>
+            <robot_positie value="ConveyorPreGraspR1"/>
+        </bin>
+        <bin name="bin5">
+            <robot_config value="bin5PreDropPickR1"/>
+            <camera_topic value="/ariac/logical_camera_5"/>
+            <camera_frame value="logical_camera_5_frame"/>
+            <robot_number value="/ariac/arm1"/>
+            <robot_positie value="ConveyorPreGraspR1"/>
+        </bin>
+        <bin name="bin6">
+            <robot_config value="bin6PreDropPickR1"/>
+            <camera_topic value="/ariac/logical_camera_6"/>
+            <camera_frame value="logical_camera_6_frame"/>
+            <robot_number value="/ariac/arm1"/>
+            <robot_positie value="ConveyorPreGraspR1"/>
+        </bin>
+    </table>
+    <table name = "unit2_part_height">
+     <part name="gear_part">
+              <part_height value="0.025"/>
+         </part>
+         <part name="gasket_part">
+              <part_height value="0.035"/>
+         </part>
+         <part name="piston_rod_part">
+              <part_height value="0.02"/>
+         </part>
+    </table>
 </tables>

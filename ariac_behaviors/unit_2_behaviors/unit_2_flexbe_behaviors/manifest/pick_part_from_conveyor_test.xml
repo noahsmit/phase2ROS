@@ -12,8 +12,8 @@
 
 
 	<!-- Contained Behaviors -->
-	<contains name="transport_conveyor_to_pick_location" />
 	<contains name="pick_part_from_conveyor" />
+	<contains name="transport_conveyor_to_pick_location" />
 
 	<!-- Available Parameters -->
 

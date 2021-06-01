@@ -8,7 +8,9 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
+from ariac_flexbe_states.end_assignment_state import EndAssignment
 from ariac_flexbe_states.message_state import MessageState
+from ariac_flexbe_states.start_assignment_state import StartAssignment
 from unit_2_flexbe_behaviors.pick_part_from_conveyor_sm import pick_part_from_conveyorSM
 from unit_2_flexbe_behaviors.transport_conveyor_to_pick_location_sm import transport_conveyor_to_pick_locationSM
 # Additional imports can be added inside the following tags
@@ -47,7 +49,7 @@ class pick_part_from_conveyor_testSM(Behavior):
 
 
 	def create(self):
-		# x:1008 y:106, x:174 y:207
+		# x:1071 y:112, x:174 y:207
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.part = ''
 		_state_machine.userdata.robot_namespace = '/ariac/arm1'
@@ -59,11 +61,17 @@ class pick_part_from_conveyor_testSM(Behavior):
 
 
 		with _state_machine:
-			# x:118 y:49
-			OperatableStateMachine.add('transport_conveyor_to_pick_location',
-										self.use_behavior(transport_conveyor_to_pick_locationSM, 'transport_conveyor_to_pick_location'),
-										transitions={'finished': 'pick_part_from_conveyor', 'failed': 'failed'},
-										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+			# x:30 y:40
+			OperatableStateMachine.add('start assinment',
+										StartAssignment(),
+										transitions={'continue': 'transport_conveyor_to_pick_location'},
+										autonomy={'continue': Autonomy.Off})
+
+			# x:892 y:64
+			OperatableStateMachine.add('end assignment',
+										EndAssignment(),
+										transitions={'continue': 'finished'},
+										autonomy={'continue': Autonomy.Off})
 
 			# x:516 y:43
 			OperatableStateMachine.add('pick_part_from_conveyor',
@@ -72,10 +80,16 @@ class pick_part_from_conveyor_testSM(Behavior):
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
 										remapping={'robot_namespace': 'robot_namespace', 'part': 'part'})
 
-			# x:798 y:53
+			# x:170 y:46
+			OperatableStateMachine.add('transport_conveyor_to_pick_location',
+										self.use_behavior(transport_conveyor_to_pick_locationSM, 'transport_conveyor_to_pick_location'),
+										transitions={'finished': 'pick_part_from_conveyor', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+
+			# x:723 y:48
 			OperatableStateMachine.add('PartMessage',
 										MessageState(),
-										transitions={'continue': 'finished'},
+										transitions={'continue': 'end assignment'},
 										autonomy={'continue': Autonomy.Off},
 										remapping={'message': 'part'})
 
