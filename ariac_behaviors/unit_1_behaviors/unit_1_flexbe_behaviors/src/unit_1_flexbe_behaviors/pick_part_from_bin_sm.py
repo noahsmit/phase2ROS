@@ -54,7 +54,7 @@ class pick_part_from_binSM(Behavior):
 
 
 	def create(self):
-		table = '/ariac_tables_unit1'
+		table = '/ariac_unit1_tables'
 		# x:30 y:365, x:437 y:159
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['part', 'robot_namespace', 'agv', 'agv2'])
 		_state_machine.userdata.part = ''

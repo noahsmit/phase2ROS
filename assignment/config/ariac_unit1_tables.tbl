@@ -54,14 +54,14 @@
 	    </part>
     </table>
     <table name = "robots">
-	    <robot name="robot1_config">
+	    <robot name="agv1">
 		    <namespace value="/ariac/arm1" />
 		    <service value='/ariac/arm1/gripper/control' />
 		    <camera value='arm1_linear_arm_actuator' />
 		    <config value='tray1PreDropR1' />
 		    <tray value='kit_tray_1' />
 	    </robot>
-	    <robot name="robot2_config">
+	    <robot name="agv2">
 		    <namespace value="/ariac/arm2" />
 		    <service value='/ariac/arm2/gripper/control' />
 		    <camera value='arm2_linear_arm_actuator' />
