@@ -16,6 +16,7 @@ from ariac_flexbe_states.lookup_from_table import LookupFromTableState
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
 from ariac_flexbe_states.srdf_state_to_moveit_ariac_state import SrdfStateToMoveitAriac
 from ariac_flexbe_states.vacuum_gripper_control_state import VacuumGripperControlState
+from ariac_support_flexbe_states.text_to_float_state import TextToFloatState
 from flexbe_states.wait_state import WaitState
 from unit_2_flexbe_behaviors.lege_bin_zoeken_v2_sm import lege_bin_zoeken_V2SM
 # Additional imports can be added inside the following tags
@@ -83,13 +84,14 @@ class pick_part_from_conveyorSM(Behavior):
 		_state_machine.userdata.joint_names1 = []
 		_state_machine.userdata.rotation = 0
 		_state_machine.userdata.gripper_service = ''
-		_state_machine.userdata.index_camera_4 = 'logical_camera_4'
+		_state_machine.userdata.index_camera_7 = 'logical_camera_7'
 		_state_machine.userdata.index_beam = 'break_beam_1'
 		_state_machine.userdata.index_detected_part = 'gasket_part'
 		_state_machine.userdata.gripper_topic = ''
 		_state_machine.userdata.config_name_predrop_bin = ''
 		_state_machine.userdata.move_group = 'manipulator'
-		_state_machine.userdata.binPartType = ''
+		_state_machine.userdata.binPartType = ['empty','empty','empty','empty','empty','empty']
+		_state_machine.userdata.config_name_move_up = 'up'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -103,7 +105,7 @@ class pick_part_from_conveyorSM(Behavior):
 										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='conveyor_configuration', index_title='logical_camera', column_title='camera_topic'),
 										transitions={'found': 'Lookup break_beam_1 topic', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_camera_4', 'column_value': 'camera_topic'})
+										remapping={'index_value': 'index_camera_7', 'column_value': 'camera_topic'})
 
 			# x:1156 y:582
 			OperatableStateMachine.add('ComputeGraspConveyor',
@@ -111,6 +113,13 @@ class pick_part_from_conveyorSM(Behavior):
 										transitions={'continue': 'MoveToPickPartFromConveyor', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'tool_link': 'tool_link', 'pose': 'pose_detected_part', 'offset': 'height_detected_part', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names1'})
+
+			# x:15 y:352
+			OperatableStateMachine.add('Deactivate gripper',
+										VacuumGripperControlState(enable=False),
+										transitions={'continue': 'finished', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'service_name': 'gripper_service'})
 
 			# x:1089 y:16
 			OperatableStateMachine.add('Detect part',
@@ -142,64 +151,64 @@ class pick_part_from_conveyorSM(Behavior):
 
 			# x:1150 y:442
 			OperatableStateMachine.add('Lookup gripper service',
-										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='detected_part', column_title='gripper_service'),
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='gripper_service'),
 										transitions={'found': 'Lookup gripper topic', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_detected_part', 'column_value': 'gripper_service'})
+										remapping={'index_value': 'bin', 'column_value': 'gripper_service'})
 
 			# x:964 y:412
 			OperatableStateMachine.add('Lookup gripper topic',
-										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='detected_part', column_title='gripper_status_topic'),
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='gripper_status_topic'),
 										transitions={'found': 'MoveToPreGraspConveyor', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_detected_part', 'column_value': 'gripper_topic'})
+										remapping={'index_value': 'bin', 'column_value': 'gripper_topic'})
 
 			# x:488 y:49
 			OperatableStateMachine.add('Lookup logical_camera_4 frame',
 										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='conveyor_configuration', index_title='logical_camera', column_title='camera_frame'),
 										transitions={'found': 'MoveR1Home', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_camera_4', 'column_value': 'camera_frame'})
+										remapping={'index_value': 'index_camera_7', 'column_value': 'camera_frame'})
 
 			# x:1150 y:380
 			OperatableStateMachine.add('Lookup part_height',
-										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='detected_part', column_title='part_height'),
-										transitions={'found': 'Lookup gripper service', 'not_found': 'failed'},
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='unit2_part_height', index_title='part', column_title='part_height'),
+										transitions={'found': 'convert text to float', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_detected_part', 'column_value': 'height_detected_part'})
+										remapping={'index_value': 'detected_part', 'column_value': 'height_detected_part'})
 
-			# x:152 y:593
+			# x:39 y:542
 			OperatableStateMachine.add('Lookup robot PreDropPositie',
-										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='detected_part', column_title='pregrasp_conveyor'),
-										transitions={'found': 'MoveToPreDropbin', 'not_found': 'failed'},
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='robot_config'),
+										transitions={'found': 'MoveToPreDrop', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_detected_part', 'column_value': 'config_name_predrop_bin'})
+										remapping={'index_value': 'bin', 'column_value': 'config_name_predrop_bin'})
 
 			# x:1105 y:315
 			OperatableStateMachine.add('Lookup robot PreGraspPositie',
-										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='detected_part', column_title='pregrasp_conveyor'),
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='robot_positie'),
 										transitions={'found': 'Lookup part_height', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_detected_part', 'column_value': 'config_name_pregrasp_conveyor'})
+										remapping={'index_value': 'bin', 'column_value': 'config_name_pregrasp_conveyor'})
 
 			# x:1101 y:243
 			OperatableStateMachine.add('Lookup robot action topic ns',
-										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='detected_part', column_title='action_topic_namespace'),
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='robot_number'),
 										transitions={'found': 'Lookup robot PreGraspPositie', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_detected_part', 'column_value': 'action_topic_namespace'})
+										remapping={'index_value': 'bin', 'column_value': 'action_topic_namespace'})
+
+			# x:352 y:637
+			OperatableStateMachine.add('Lookup robot tussenpose',
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='robot_tussenstop'),
+										transitions={'found': 'MoveToTussenpositie', 'not_found': 'failed'},
+										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'index_value': 'bin', 'column_value': 'config_name_tussenstop'})
 
 			# x:736 y:49
 			OperatableStateMachine.add('MoveR1Home',
 										SrdfStateToMoveitAriac(),
 										transitions={'reached': 'MoveR2Home', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
-										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
-										remapping={'config_name': 'config_name_homeR1', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace_R1', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
-
-			# x:474 y:594
-			OperatableStateMachine.add('MoveR1Home_2',
-										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'Lookup robot PreDropPositie', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'config_name_homeR1', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace_R1', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -217,25 +226,39 @@ class pick_part_from_conveyorSM(Behavior):
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
 										remapping={'action_topic_namespace': 'action_topic_namespace', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names1'})
 
-			# x:67 y:470
-			OperatableStateMachine.add('MoveToPreDropbin',
+			# x:21 y:436
+			OperatableStateMachine.add('MoveToPreDrop',
 										SrdfStateToMoveitAriac(),
-										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'Deactivate gripper', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
-										remapping={'config_name': 'config_name_pregrasp_conveyor', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace_R1', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+										remapping={'config_name': 'config_name_predrop_bin', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
 			# x:1145 y:509
 			OperatableStateMachine.add('MoveToPreGraspConveyor',
 										SrdfStateToMoveitAriac(),
 										transitions={'reached': 'ComputeGraspConveyor', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
-										remapping={'config_name': 'config_name_pregrasp_conveyor', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace_R1', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+										remapping={'config_name': 'config_name_pregrasp_conveyor', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:200 y:605
+			OperatableStateMachine.add('MoveToTussenpositie',
+										SrdfStateToMoveitAriac(),
+										transitions={'reached': 'Lookup robot PreDropPositie', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
+										remapping={'config_name': 'config_name_tussenstop', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
 			# x:540 y:657
 			OperatableStateMachine.add('Wacht even',
 										WaitState(wait_time=1),
-										transitions={'done': 'MoveR1Home_2'},
+										transitions={'done': 'Lookup robot tussenpose'},
 										autonomy={'done': Autonomy.Off})
+
+			# x:1298 y:407
+			OperatableStateMachine.add('convert text to float',
+										TextToFloatState(),
+										transitions={'done': 'Lookup gripper service'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'text_value': 'height_detected_part', 'float_value': 'height_detected_part'})
 
 			# x:1074 y:82
 			OperatableStateMachine.add('lege_bin_zoeken_V2',
