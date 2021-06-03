@@ -3,13 +3,11 @@
     <table name = "bin_configuration">
 	    <bin name="bin1">
 		    <robot2_config value="bin1PreDropPickR2" />
-		    <robot1_config value="x" />
 		    <camera_topic value="/ariac/logical_camera_1" />
 		    <camera_frame value="logical_camera_1_frame" />
 	    </bin>
 	    <bin name="bin2">
 		    <robot2_config value="bin2PreDropPickR2" />
-		    <robot1_config value="x" />
 		    <camera_topic value="/ariac/logical_camera_2" />
 		    <camera_frame value="logical_camera_2_frame" />
 	    </bin>
@@ -26,13 +24,11 @@
 		    <camera_frame value="logical_camera_4_frame" />
 	    </bin>
 	    <bin name="bin5">
-		    <robot2_config value="X" />
 		    <robot1_config value="bin5PreDropPickR1" />
 		    <camera_topic value="/ariac/logical_camera_5" />
 		    <camera_frame value="logical_camera_5_frame" />
 	    </bin>
 	    <bin name="bin6">
-		    <robot2_config value="x" />
 		    <robot1_config value="bin6PreDropPickR1" />
 		    <camera_topic value="/ariac/logical_camera_6" />
 		    <camera_frame value="logical_camera_6_frame" />
@@ -42,7 +38,7 @@
     <table name = "parts_bin">
 	    <part name="piston_rod_part">
 		    <bin value="bin3" />
-		    <height value="0.017" />
+		    <height value="0.0165" />
 	    </part>
 	    <part name="gear_part">
 		    <bin value="bin4" />
@@ -50,7 +46,7 @@
 	    </part>
 	    <part name="gasket_part">
 		    <bin value="bin5" />
-		    <height value="0.038" />
+		    <height value="0.0377" />
 	    </part>
     </table>
     <table name = "robots">
@@ -59,6 +55,7 @@
 		    <service value='/ariac/arm1/gripper/control' />
 		    <camera value='arm1_linear_arm_actuator' />
 		    <config value='tray1PreDropR1' />
+		    <config2 value='ConveyorPreGraspR1' />
 		    <tray value='kit_tray_1' />
 	    </robot>
 	    <robot name="agv2">
@@ -66,6 +63,7 @@
 		    <service value='/ariac/arm2/gripper/control' />
 		    <camera value='arm2_linear_arm_actuator' />
 		    <config value='tray2PreDropR2' />
+		    <config2 value='ConveyorPreGraspR2' />
 		    <tray value='kit_tray_2' />
 	    </robot>
     </table>
