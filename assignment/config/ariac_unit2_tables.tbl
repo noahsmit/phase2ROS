@@ -77,6 +77,8 @@
 	    <gripper_service value="/ariac/arm2/gripper/control" />
 	    <gripper_status_topic value="/ariac/arm2/gripper/state" />
             <start_positie_bin value="[-0.2, -1.768, 0.724]"/>
+	    <camera_bin_frame value="logical_camera_1_frame" />
+	    <bin_frame value="bin1_frame" />
         </bin>
         <bin name="bin2">
             <robot_config value="bin2PreDropPickR2"/>
@@ -88,6 +90,8 @@
 	    <gripper_service value="/ariac/arm2/gripper/control" />
 	    <gripper_status_topic value="/ariac/arm2/gripper/state" />
             <start_positie_bin value="[-0.2, -1.001, 0.724]"/>
+	    <camera_bin_frame value="logical_camera_2_frame" />
+	    <bin_frame value="bin2_frame" />
         </bin>
         <bin name="bin3">
             <robot_config value="bin3PreDropPickR2"/>
@@ -99,6 +103,8 @@
 	    <gripper_service value="/ariac/arm2/gripper/control" />
 	    <gripper_status_topic value="/ariac/arm2/gripper/state" />
             <start_positie_bin value="[-0.2, -0.234, 0.724]"/>
+	    <camera_bin_frame value="logical_camera_3_frame" />
+	    <bin_frame value="bin3_frame" />
         </bin>
         <bin name="bin4">
             <robot_config value="bin4PreDropPickR1"/>
@@ -110,6 +116,8 @@
 	    <gripper_service value="/ariac/arm1/gripper/control" />
 	    <gripper_status_topic value="/ariac/arm1/gripper/state" />
             <start_positie_bin value="[-0.2, 0.533, 0.724]"/>
+	    <camera_bin_frame value="logical_camera_4_frame" />
+	    <bin_frame value="bin4_frame" />
         </bin>
         <bin name="bin5">
             <robot_config value="bin5PreDropPickR1"/>
@@ -121,6 +129,8 @@
 	    <gripper_service value="/ariac/arm1/gripper/control" />
 	    <gripper_status_topic value="/ariac/arm1/gripper/state" />
             <start_positie_bin value="[-0.2, 1.3, 0.724]"/>
+	    <camera_bin_frame value="logical_camera_5_frame" />
+	    <bin_frame value="bin5_frame" />
         </bin>
         <bin name="bin6">
             <robot_config value="bin6PreDropPickR1"/>
@@ -132,6 +142,8 @@
 	    <gripper_service value="/ariac/arm1/gripper/control" />
 	    <gripper_status_topic value="/ariac/arm1/gripper/state" />
             <start_positie_bin value="[-0.2, 2.067, 0.724]"/>
+	    <camera_bin_frame value="logical_camera_6_frame" />
+	    <bin_frame value="bin6_frame" />
         </bin>
     </table>
     <table name = "unit2_part_height">
