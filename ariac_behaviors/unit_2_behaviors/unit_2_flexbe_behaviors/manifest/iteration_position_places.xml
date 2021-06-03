@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="iteration_position_places">
+
+	<executable package_path="unit_2_flexbe_behaviors.iteration_position_places_sm" class="iteration_position_placesSM" />
+	<tagstring></tagstring>
+	<author>Rick Verschuuren</author>
+	<date>Wed Jun 02 2021</date>
+	<description>
+		iteration for changing the drop positions of the bins.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>
