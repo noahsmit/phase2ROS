@@ -8,7 +8,11 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
+from ariac_flexbe_states.compute_grasp_ariac_state import ComputeGraspAriacState
 from ariac_flexbe_states.lookup_from_table import LookupFromTableState
+from ariac_support_flexbe_states.create_pose import CreatePoseState
+from ariac_support_flexbe_states.equal_state import EqualState
+from unit_2_flexbe_behaviors.iteration_position_places_sm import iteration_position_placesSM
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -32,6 +36,7 @@ class place_part_on_binSM(Behavior):
 		# parameters of this behavior
 
 		# references to used behaviors
+		self.add_behavior(iteration_position_placesSM, 'iteration_position_places')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -43,9 +48,18 @@ class place_part_on_binSM(Behavior):
 
 
 	def create(self):
-		# x:1068 y:230, x:344 y:322
+		# x:877 y:519, x:578 y:161
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['index_bin'])
 		_state_machine.userdata.index_bin = ''
+		_state_machine.userdata.comparison = []
+		_state_machine.userdata.positie_xyz = []
+		_state_machine.userdata.place_pose = []
+		_state_machine.userdata.bin = ''
+		_state_machine.userdata.move_group = 'manipulator'
+		_state_machine.userdata.offset = 0
+		_state_machine.userdata.rotation = 0
+		_state_machine.userdata.action_topic_namespace = ''
+		_state_machine.userdata.tool_link = 'ee_link'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -54,12 +68,40 @@ class place_part_on_binSM(Behavior):
 
 
 		with _state_machine:
-			# x:131 y:29
-			OperatableStateMachine.add('Lookup PreDropForBin',
-										LookupFromTableState(parameter_name='/ariac_tables_unit1', table_name='bin_configuration', index_title='bin', column_title='robot_config'),
-										transitions={'found': 'finished', 'not_found': 'failed'},
+			# x:481 y:55
+			OperatableStateMachine.add('Check of de beginpositie al opgevraagt is',
+										EqualState(),
+										transitions={'true': 'Lookup eerste drop positie', 'false': 'iteration_position_places'},
+										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
+										remapping={'value_a': 'comparison', 'value_b': 'positie_xyz'})
+
+			# x:740 y:270
+			OperatableStateMachine.add('Compute place bin',
+										ComputeGraspAriacState(joint_names=['linear_arm_actuator_joint', 'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']),
+										transitions={'continue': 'finished', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'tool_link': 'tool_link', 'pose': 'place_pose', 'offset': 'offset', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:511 y:255
+			OperatableStateMachine.add('Generate pose',
+										CreatePoseState(xyz=[0,0,0], rpy=[0,0,0]),
+										transitions={'continue': 'Compute place bin', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'place_pose'})
+
+			# x:742 y:130
+			OperatableStateMachine.add('Lookup eerste drop positie',
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='start_positie_bin'),
+										transitions={'found': 'Generate pose', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'index_bin', 'column_value': 'column_value'})
+										remapping={'index_value': 'bin', 'column_value': 'positie_xyz'})
+
+			# x:254 y:128
+			OperatableStateMachine.add('iteration_position_places',
+										self.use_behavior(iteration_position_placesSM, 'iteration_position_places'),
+										transitions={'finished': 'Generate pose', 'failed': 'failed'},
+										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
+										remapping={'positie_xyz': 'positie_xyz'})
 
 
 		return _state_machine

@@ -8,7 +8,7 @@ orders:
   order_0:
     announcement_condition: time
     announcement_condition_value: 0.0
-    shipment_count: 2
+    shipment_count: 1
     destinations: [agv1]
     products:
       part_0:
@@ -86,3 +86,4 @@ belt_models:
 
 
 time_limit: -1
+
