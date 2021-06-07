@@ -12,24 +12,11 @@ from ariac_flexbe_states.add_offset_to_pose_state import AddOffsetToPoseState
 from ariac_flexbe_states.get_object_pose import GetObjectPoseState
 from ariac_flexbe_states.lookup_from_table import LookupFromTableState
 from ariac_support_flexbe_states.add_numeric_state import AddNumericState
+from ariac_support_flexbe_states.create_pose import CreatePoseState
 from ariac_support_flexbe_states.equal_state import EqualState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
-import rospy
-import rostopic
-import inspect
 
-import tf2_ros
-import tf2_geometry_msgs
-import geometry_msgs.msg
-from tf.transformations import *
-
-
-from flexbe_core import EventState, Logger
-from geometry_msgs.msg import Pose, Point, Vector3, Quaternion, PoseStamped
-from flexbe_core.proxy import ProxySubscriberCached
-from osrf_gear.msg import LogicalCameraImage, Model
-from osrf_gear.msg import Header
 # [/MANUAL_IMPORT]
 
 
@@ -61,9 +48,11 @@ class iteration_position_placesSM(Behavior):
 
 
 	def create(self):
-		xyz = [0.15, 0.15, 0.5]
+		offset_p1 = [-0.15,-0.15,0.03]
+		offset_p2 = [0.15,0,0]
+		rpy = [0,0,0]
 		# x:335 y:625, x:246 y:624
-		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['positie_xyz', 'bin'], output_keys=['positie_xyz'])
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['positie_xyz', 'bin', 'iterator'], output_keys=['positie_xyz', 'iterator'])
 		_state_machine.userdata.iterator = 1
 		_state_machine.userdata.P1 = 1
 		_state_machine.userdata.P2 = 2
@@ -73,17 +62,18 @@ class iteration_position_placesSM(Behavior):
 		_state_machine.userdata.P6 = 6
 		_state_machine.userdata.one_up = 1
 		_state_machine.userdata.positie_xyz = []
-		_state_machine.userdata.offset_p3 = ['0' '-0.15' '0' '0' '0' '0' '0']
-		_state_machine.userdata.offset_p4 = ['-0.3' '0.30' '0' '0' '0' '0' '0']
-		_state_machine.userdata.offset_p5 = ['0' '-0.15' '0' '0' '0' '0' '0']
-		_state_machine.userdata.offset_p2 = ['0' '-0.15' '0' '0' '0' '0' '0']
-		_state_machine.userdata.offset_p6 = ['0' '-0.15' '0' '0' '0' '0' '0']
+		_state_machine.userdata.offset_p3 = [0,-0.15,0,0,0,0]
+		_state_machine.userdata.offset_p4 = [-0.3,0.30,0,0,0,0]
+		_state_machine.userdata.offset_p5 = [0,-0.15,0,0,0,0]
+		_state_machine.userdata.offset_p2 = []
+		_state_machine.userdata.offset_p6 = [0,-0.15,0,0,0,0]
 		_state_machine.userdata.reset_iterator = -5
-		_state_machine.userdata.reset_positie = ['0.3' '0.30' '0' '0' '0' '0' '0']
+		_state_machine.userdata.reset_positie = [0.3,0.30,0,0,0,0]
 		_state_machine.userdata.bin = ''
 		_state_machine.userdata.camera_bin_frame = ''
-		_state_machine.userdata.offset_p1 = PoseStamped(Header(0,rospy.Time.now(),'world'),Pose(Point(0.15, 0.15, 0.5), Quaternion(0,0,0,0)))
+		_state_machine.userdata.offset_p1 = []
 		_state_machine.userdata.bin_frame = ''
+		_state_machine.userdata.ref_frame = 'world'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -92,14 +82,14 @@ class iteration_position_placesSM(Behavior):
 
 
 		with _state_machine:
-			# x:14 y:632
-			OperatableStateMachine.add('Lookup camera_bin_frame',
+			# x:34 y:544
+			OperatableStateMachine.add('Lookup camera frame',
 										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='camera_bin_frame'),
-										transitions={'found': 'Lookup camera_bin_frame_2', 'not_found': 'failed'},
+										transitions={'found': 'Lookup bin frame', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
-										remapping={'index_value': 'bin', 'column_value': 'camera_bin_frame'})
+										remapping={'index_value': 'bin', 'column_value': 'bin_frame'})
 
-			# x:329 y:130
+			# x:322 y:219
 			OperatableStateMachine.add('Add_offset_p2',
 										AddOffsetToPoseState(),
 										transitions={'continue': 'Update iterator p2'},
@@ -134,24 +124,38 @@ class iteration_position_placesSM(Behavior):
 										autonomy={'continue': Autonomy.Off},
 										remapping={'input_pose': 'positie_xyz', 'offset_pose': 'offset_p6', 'output_pose': 'positie_xyz'})
 
-			# x:21 y:436
-			OperatableStateMachine.add('Get Bin pose',
+			# x:131 y:122
+			OperatableStateMachine.add('Create offset p1',
+										CreatePoseState(xyz=offset_p1, rpy=rpy),
+										transitions={'continue': 'Add_offset_p1', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'offset_p1'})
+
+			# x:311 y:121
+			OperatableStateMachine.add('Create offset p1_2',
+										CreatePoseState(xyz=offset_p2, rpy=rpy),
+										transitions={'continue': 'Add_offset_p2', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'offset_p2'})
+
+			# x:39 y:374
+			OperatableStateMachine.add('GetBinPose',
 										GetObjectPoseState(),
 										transitions={'continue': 'If p1 is available ', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'ref_frame': 'camera_bin_frame', 'frame': 'bin_frame', 'pose': 'positie_xyz'})
+										remapping={'ref_frame': 'ref_frame', 'frame': 'bin_frame', 'pose': 'positie_xyz'})
 
 			# x:131 y:47
 			OperatableStateMachine.add('If p1 is available ',
 										EqualState(),
-										transitions={'true': 'Add_offset_p1', 'false': 'If p2 is available'},
+										transitions={'true': 'Create offset p1', 'false': 'If p2 is available'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'P1', 'value_b': 'iterator'})
 
 			# x:318 y:50
 			OperatableStateMachine.add('If p2 is available',
 										EqualState(),
-										transitions={'true': 'Add_offset_p2', 'false': 'If p3 is available'},
+										transitions={'true': 'Create offset p1_2', 'false': 'If p3 is available'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'P2', 'value_b': 'iterator'})
 
@@ -183,10 +187,10 @@ class iteration_position_placesSM(Behavior):
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'P6', 'value_b': 'iterator'})
 
-			# x:12 y:529
-			OperatableStateMachine.add('Lookup camera_bin_frame_2',
+			# x:33 y:465
+			OperatableStateMachine.add('Lookup bin frame',
 										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='bin_configuration', index_title='bin', column_title='bin_frame'),
-										transitions={'found': 'Get Bin pose', 'not_found': 'failed'},
+										transitions={'found': 'GetBinPose', 'not_found': 'failed'},
 										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'index_value': 'bin', 'column_value': 'bin_frame'})
 
@@ -204,14 +208,14 @@ class iteration_position_placesSM(Behavior):
 										autonomy={'continue': Autonomy.Off},
 										remapping={'input_pose': 'positie_xyz', 'offset_pose': 'reset_positie', 'output_pose': 'positie_xyz'})
 
-			# x:138 y:217
+			# x:135 y:300
 			OperatableStateMachine.add('Update iterator p1',
 										AddNumericState(),
 										transitions={'done': 'finished'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'value_a': 'iterator', 'value_b': 'one_up', 'result': 'iterator'})
 
-			# x:314 y:214
+			# x:308 y:295
 			OperatableStateMachine.add('Update iterator p2',
 										AddNumericState(),
 										transitions={'done': 'finished'},
@@ -246,7 +250,7 @@ class iteration_position_placesSM(Behavior):
 										autonomy={'done': Autonomy.Off},
 										remapping={'value_a': 'iterator', 'value_b': 'one_up', 'result': 'iterator'})
 
-			# x:141 y:120
+			# x:145 y:228
 			OperatableStateMachine.add('Add_offset_p1',
 										AddOffsetToPoseState(),
 										transitions={'continue': 'Update iterator p1'},

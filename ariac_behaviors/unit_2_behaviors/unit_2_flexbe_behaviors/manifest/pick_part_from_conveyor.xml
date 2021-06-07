@@ -13,7 +13,6 @@
 
 	<!-- Contained Behaviors -->
 	<contains name="iteration_position_places" />
-	<contains name="lege_bin_zoeken_V2" />
 
 	<!-- Available Parameters -->
 

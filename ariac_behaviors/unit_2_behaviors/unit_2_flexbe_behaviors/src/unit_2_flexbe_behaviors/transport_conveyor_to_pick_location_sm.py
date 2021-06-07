@@ -52,7 +52,7 @@ class transport_conveyor_to_pick_locationSM(Behavior):
 		# x:1262 y:56, x:745 y:264
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.speed_conveyor = speed_conveyor
-		_state_machine.userdata.object_detected = []
+		_state_machine.userdata.object_detected = ''
 		_state_machine.userdata.beam_topic = ''
 		_state_machine.userdata.index_value = 'break_beam'
 		_state_machine.userdata.speed_conveyor_off = speed_conveyor_off
@@ -65,8 +65,8 @@ class transport_conveyor_to_pick_locationSM(Behavior):
 
 
 		with _state_machine:
-			# x:63 y:55
-			OperatableStateMachine.add('Start assignment',
+			# x:55 y:50
+			OperatableStateMachine.add('start',
 										StartAssignment(),
 										transitions={'continue': 'Lookup break_beam_1_change topic'},
 										autonomy={'continue': Autonomy.Off})
@@ -77,12 +77,6 @@ class transport_conveyor_to_pick_locationSM(Behavior):
 										transitions={'continue': 'Part detected ', 'fail': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
 										remapping={'power': 'speed_conveyor'})
-
-			# x:1096 y:52
-			OperatableStateMachine.add('End assignment',
-										EndAssignment(),
-										transitions={'continue': 'finished'},
-										autonomy={'continue': Autonomy.Off})
 
 			# x:212 y:54
 			OperatableStateMachine.add('Lookup break_beam_1_change topic',
@@ -98,10 +92,16 @@ class transport_conveyor_to_pick_locationSM(Behavior):
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'topic': 'beam_topic', 'object_detected': 'object_detected'})
 
+			# x:1096 y:54
+			OperatableStateMachine.add('end',
+										EndAssignment(),
+										transitions={'continue': 'finished'},
+										autonomy={'continue': Autonomy.Off})
+
 			# x:903 y:54
 			OperatableStateMachine.add('Conveyor off',
 										SetConveyorbeltPowerState(),
-										transitions={'continue': 'End assignment', 'fail': 'failed'},
+										transitions={'continue': 'end', 'fail': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
 										remapping={'power': 'speed_conveyor_off'})
 

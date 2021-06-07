@@ -10,7 +10,6 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_flexbe_states.compute_grasp_ariac_state import ComputeGraspAriacState
 from ariac_flexbe_states.detect_first_part_camera_ariac_state import DetectFirstPartCameraAriacState
-from ariac_flexbe_states.getEmptyBin import getEmptyBin
 from ariac_flexbe_states.get_vacuum_gripper_status_state import GetVacuumGripperStatusState
 from ariac_flexbe_states.lookup_from_table import LookupFromTableState
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
@@ -20,7 +19,6 @@ from ariac_support_flexbe_states.equal_state import EqualState
 from ariac_support_flexbe_states.text_to_float_state import TextToFloatState
 from flexbe_states.wait_state import WaitState
 from unit_2_flexbe_behaviors.iteration_position_places_sm import iteration_position_placesSM
-from unit_2_flexbe_behaviors.lege_bin_zoeken_v2_sm import lege_bin_zoeken_V2SM
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 from geometry_msgs.msg import PoseStamped
@@ -46,7 +44,6 @@ class pick_part_from_conveyorSM(Behavior):
 
 		# references to used behaviors
 		self.add_behavior(iteration_position_placesSM, 'iteration_position_places')
-		self.add_behavior(lege_bin_zoeken_V2SM, 'lege_bin_zoeken_V2')
 
 		# Additional initialization code can be added inside the following tags
 		# [MANUAL_INIT]
@@ -59,7 +56,7 @@ class pick_part_from_conveyorSM(Behavior):
 
 	def create(self):
 		# x:14 y:93, x:554 y:290
-		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['robot_namespace'], output_keys=['part', 'bin'])
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'], input_keys=['robot_namespace', 'iterator'], output_keys=['part', 'bin', 'iterator'])
 		_state_machine.userdata.detected_part = ''
 		_state_machine.userdata.robot_namespace = ''
 		_state_machine.userdata.camera_topic = ''
@@ -99,10 +96,11 @@ class pick_part_from_conveyorSM(Behavior):
 		_state_machine.userdata.begin_positie_bin_part = []
 		_state_machine.userdata.comparison = []
 		_state_machine.userdata.offset_pose = []
-		_state_machine.userdata.positie_xyz = [-0.2, -1.768, 0.724]
+		_state_machine.userdata.positie_xyz = []
 		_state_machine.userdata.positie_rpy = [0, 0, 0]
 		_state_machine.userdata.orientation = [0, 0, 0]
 		_state_machine.userdata.bin = ''
+		_state_machine.userdata.iterator = 1
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -128,7 +126,7 @@ class pick_part_from_conveyorSM(Behavior):
 			# x:10 y:274
 			OperatableStateMachine.add('ComputePlaceBin',
 										ComputeGraspAriacState(joint_names=['linear_arm_actuator_joint', 'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']),
-										transitions={'continue': 'MoveToPickPartFromConveyor_2', 'failed': 'failed'},
+										transitions={'continue': 'MoveTodrop', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'tool_link': 'tool_link', 'pose': 'positie_xyz', 'offset': 'height_detected_part', 'rotation': 'rotation', 'joint_values': 'joint_values', 'joint_names': 'joint_names1'})
 
@@ -139,19 +137,12 @@ class pick_part_from_conveyorSM(Behavior):
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'service_name': 'gripper_service'})
 
-			# x:1089 y:16
+			# x:1090 y:71
 			OperatableStateMachine.add('Detect part',
 										DetectFirstPartCameraAriacState(part_list=['gasket_part', 'piston_rod_part', 'gear_part'], time_out=0.5),
-										transitions={'continue': 'lege_bin_zoeken_V2', 'failed': 'failed', 'not_found': 'failed'},
+										transitions={'continue': 'Lookup bin for part', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'ref_frame': 'ref_frame', 'camera_topic': 'camera_topic', 'camera_frame': 'camera_frame', 'part': 'detected_part', 'pose': 'pose_detected_part'})
-
-			# x:1217 y:165
-			OperatableStateMachine.add('Genereer de lege bin list',
-										getEmptyBin(),
-										transitions={'continue': 'Lookup robot action topic ns', 'failed': 'failed'},
-										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'binPartType': 'binPartType', 'bin': 'bin', 'bin_frame': 'bin_frame'})
 
 			# x:874 y:659
 			OperatableStateMachine.add('Gripper status',
@@ -159,6 +150,13 @@ class pick_part_from_conveyorSM(Behavior):
 										transitions={'continue': 'MoveToPickPartFromConveyor', 'fail': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'fail': Autonomy.Off},
 										remapping={'topic_name': 'gripper_topic', 'enabled': 'enabled', 'attached': 'attached'})
+
+			# x:1100 y:156
+			OperatableStateMachine.add('Lookup bin for part',
+										LookupFromTableState(parameter_name='/ariac_unit2_tables', table_name='part_robot_keuze', index_title='part', column_title='bin_nr'),
+										transitions={'found': 'Lookup robot action topic ns', 'not_found': 'failed'},
+										autonomy={'found': Autonomy.Off, 'not_found': Autonomy.Off},
+										remapping={'index_value': 'detected_part', 'column_value': 'bin'})
 
 			# x:274 y:48
 			OperatableStateMachine.add('Lookup break_beam_1 topic',
@@ -251,13 +249,6 @@ class pick_part_from_conveyorSM(Behavior):
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
 										remapping={'action_topic_namespace': 'action_topic_namespace', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names1'})
 
-			# x:12 y:205
-			OperatableStateMachine.add('MoveToPickPartFromConveyor_2',
-										MoveitToJointsDynAriacState(),
-										transitions={'reached': 'Deactivate gripper', 'planning_failed': 'failed', 'control_failed': 'failed'},
-										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
-										remapping={'action_topic_namespace': 'action_topic_namespace', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names1'})
-
 			# x:15 y:593
 			OperatableStateMachine.add('MoveToPreDrop',
 										SrdfStateToMoveitAriac(),
@@ -279,6 +270,13 @@ class pick_part_from_conveyorSM(Behavior):
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'config_name_tussenstop', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'action_topic': 'action_topic', 'robot_name': 'robot_name_R1', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
+			# x:12 y:205
+			OperatableStateMachine.add('MoveTodrop',
+										MoveitToJointsDynAriacState(),
+										transitions={'reached': 'Deactivate gripper', 'planning_failed': 'failed', 'control_failed': 'failed'},
+										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
+										remapping={'action_topic_namespace': 'action_topic_namespace', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names1'})
+
 			# x:540 y:657
 			OperatableStateMachine.add('Wacht even',
 										WaitState(wait_time=1),
@@ -290,7 +288,7 @@ class pick_part_from_conveyorSM(Behavior):
 										EqualState(),
 										transitions={'true': 'iteration_position_places', 'false': 'iteration_position_places'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
-										remapping={'value_a': 'comparison', 'value_b': 'begin_positie_bin_part'})
+										remapping={'value_a': 'comparison', 'value_b': 'positie_xyz'})
 
 			# x:1298 y:407
 			OperatableStateMachine.add('convert text to float',
@@ -299,18 +297,12 @@ class pick_part_from_conveyorSM(Behavior):
 										autonomy={'done': Autonomy.Off},
 										remapping={'text_value': 'height_detected_part', 'float_value': 'height_detected_part'})
 
-			# x:17 y:390
+			# x:10 y:394
 			OperatableStateMachine.add('iteration_position_places',
 										self.use_behavior(iteration_position_placesSM, 'iteration_position_places'),
 										transitions={'finished': 'ComputePlaceBin', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
-										remapping={'positie_xyz': 'positie_xyz'})
-
-			# x:1074 y:82
-			OperatableStateMachine.add('lege_bin_zoeken_V2',
-										self.use_behavior(lege_bin_zoeken_V2SM, 'lege_bin_zoeken_V2'),
-										transitions={'finished': 'Genereer de lege bin list', 'failed': 'failed'},
-										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit})
+										remapping={'positie_xyz': 'positie_xyz', 'bin': 'bin', 'iterator': 'iterator'})
 
 			# x:1162 y:657
 			OperatableStateMachine.add('Activate gripper',

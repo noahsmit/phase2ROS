@@ -49,10 +49,11 @@ class pick_part_from_conveyor_testSM(Behavior):
 
 
 	def create(self):
-		# x:1071 y:112, x:174 y:207
+		# x:1071 y:112, x:249 y:381
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.part = ''
 		_state_machine.userdata.robot_namespace = '/ariac/arm1'
+		_state_machine.userdata.iterator = 1
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -70,7 +71,7 @@ class pick_part_from_conveyor_testSM(Behavior):
 			# x:892 y:64
 			OperatableStateMachine.add('end assignment',
 										EndAssignment(),
-										transitions={'continue': 'finished'},
+										transitions={'continue': 'transport_conveyor_to_pick_location'},
 										autonomy={'continue': Autonomy.Off})
 
 			# x:516 y:43
@@ -78,7 +79,7 @@ class pick_part_from_conveyor_testSM(Behavior):
 										self.use_behavior(pick_part_from_conveyorSM, 'pick_part_from_conveyor'),
 										transitions={'finished': 'PartMessage', 'failed': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'failed': Autonomy.Inherit},
-										remapping={'robot_namespace': 'robot_namespace', 'part': 'part'})
+										remapping={'robot_namespace': 'robot_namespace', 'iterator': 'iterator', 'part': 'part', 'bin': 'bin'})
 
 			# x:170 y:46
 			OperatableStateMachine.add('transport_conveyor_to_pick_location',
