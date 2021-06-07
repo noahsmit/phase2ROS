@@ -72,9 +72,9 @@
     </group_state>
     <group_state name="ConveyorPreGraspR2" group="manipulator">
         <joint name="linear_arm_actuator_joint" value="-0.05" />
-        <joint name="shoulder_pan_joint" value="-0.05" />
+        <joint name="shoulder_pan_joint" value="-0.03" />
         <joint name="shoulder_lift_joint" value="-0.70" />
-        <joint name="elbow_joint" value="1.19" />
+        <joint name="elbow_joint" value="1.21" />
         <joint name="wrist_1_joint" value="-2.07" />
         <joint name="wrist_2_joint" value="-1.57" />
         <joint name="wrist_3_joint" value="0" />

@@ -35,10 +35,10 @@ class SubmitShipmentState(EventState):
 		# Main purpose is to check state conditions and trigger a corresponding outcome.
 		# If no outcome is returned, the state will stay active.
 		request = SubmitShipmentRequest()
-		if userdata.agv_id = 'agv1':
+		if userdata.agv_id == 'agv1':
 			request.destination_id = '1'
 		else:
-			if userdata.agv_id = 'agv2':
+			if userdata.agv_id == 'agv2':
 				request.destination_id = '2'
 
 			else:

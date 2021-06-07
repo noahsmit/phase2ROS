@@ -45,14 +45,17 @@ from tf.transformations import *
 
 
 from flexbe_core import EventState, Logger
-from geometry_msgs.msg import Pose, Point, Vector3, Quaternion
+from geometry_msgs.msg import Pose, Point, Vector3, Quaternion, PoseStamped
 from flexbe_core.proxy import ProxySubscriberCached
+from osrf_gear.msg import LogicalCameraImage, Model
+
 
 '''
 
 Created on March 21, 2021
 
 @author: Gerard Harkema
+@author-updated: Noah Smit
 
 '''
 
@@ -68,22 +71,64 @@ class CreatePoseState(EventState):
 
 	'''
 
-	def __init__(self, xyz, rpy):
-		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(CreatePoseState, self).__init__(outcomes = ['continue', 'failed'], output_keys = ['pose'])
 
-		self._pose = Pose()
-		self._pose.position.x = xyz[0]
-		self._pose.position.y = xyz[1]
-		self._pose.position.z = xyz[2]
-		q = quaternion_from_euler(rpy[0], rpy[1], rpy[2])	
-		self._pose.orientation = Quaternion(*q)
-		#rospy.logerr(self._pose)	
+
+	def __init__(self):
+		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
+		super(CreatePoseState, self).__init__(outcomes = ['continue', 'failed'], output_keys = ['pose'], input_keys = ['pose' , 'rpy'])
+
+
+		#rospy.logerr(self._pose)
+Point(13)
+
+from geometry_msgs.msg import Pose, Point, Vector3, Quaternion, PoseStamped
+		def posetr(self, point):
+			p = PoseStamped()
+    		p.pose.position.x = self.point.x
+    		p.pose.position.y = self.point.y
+			p.pose.position.z = self.point.z
+			q = quaternion_from_euler(0,0,0)
+			p.pose.orientation = Quaternion(*q)
+    		return p
+
+
+import rospy
+import rostopic
+import inspect
+
+import tf2_ros
+import tf2_geometry_msgs
+import geometry_msgs.msg
+from tf.transformations import *
+
+
+from flexbe_core import EventState, Logger
+from geometry_msgs.msg import Pose, Point, Vector3, Quaternion, PoseStamped
+from flexbe_core.proxy import ProxySubscriberCached
+from osrf_gear.msg import LogicalCameraImage, Model
+from std_msgs import Header
+	PoseStamped(Header(0,rospy.Time.now(),'world'),Pose(Point(0,0,0), Quaternion(0,0,0,0)))
 
 
 
 	def execute(self, userdata):
-		userdata.pose = self._pose
+		pose_stamped = PoseStamped()
+		pose_stamped.header.stamp = rospy.Time.now()
+		pose_stamped.header.frame_id = 'world'
+
+		pose2 = Pose()
+		pose2.position.x
+
+
+		pose_stamped.pose.position.x = userdata.x
+		pose_stamped.pose.position.y = userdata.y
+		pose_stamped.pose.position.z = userdata.z
+		q = quaternion_from_euler(userdata.rpy[0], userdata.rpy[1], userdata.rpy[2])
+		defined_pose.orientation = Quaternion(*q)
+
+		pose_stamped.pose = defined_pose
+
+		userdata.pose = pose_stamped
 		return 'continue'
 
 	def on_enter(self, userdata):
@@ -111,6 +156,3 @@ class CreatePoseState(EventState):
 		# Use this event to clean up things like claimed resources.
 
 		pass # Nothing to do
-
-
-

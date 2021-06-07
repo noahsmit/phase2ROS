@@ -38,7 +38,7 @@
     <table name = "parts_bin">
 	    <part name="piston_rod_part">
 		    <bin value="bin3" />
-		    <height value="0.0165" />
+		    <height value="0.0178" />
 	    </part>
 	    <part name="gear_part">
 		    <bin value="bin4" />
@@ -46,7 +46,7 @@
 	    </part>
 	    <part name="gasket_part">
 		    <bin value="bin5" />
-		    <height value="0.0377" />
+		    <height value="0.039" />
 	    </part>
     </table>
     <table name = "robots">

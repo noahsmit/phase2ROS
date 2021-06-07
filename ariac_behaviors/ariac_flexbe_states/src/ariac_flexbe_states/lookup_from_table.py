@@ -93,9 +93,10 @@ class LookupFromTableState(EventState):
                     if break_flag:
                         break
 
-                break # only one tables-section                        
-                
-						
+
+                break # only one tables-section
+
+
         if not userdata.column_value:
             Logger.logwarn('Did not found item in lookup table')
             self._param_error     = True

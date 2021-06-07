@@ -199,10 +199,17 @@ class pick_part_from_binSM(Behavior):
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'position', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'action_topic': 'action_topic', 'robot_name': 'robot_namespace', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
-			# x:110 y:492
+			# x:0 y:458
+			OperatableStateMachine.add('MoveBack',
+										SrdfStateToMoveitAriac(),
+										transitions={'reached': 'MoveToPick', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
+										remapping={'config_name': 'position', 'move_group': 'move_group', 'action_topic_namespace': 'action_topic_namespace', 'action_topic': 'action_topic', 'robot_name': 'robot_namespace', 'config_name_out': 'config_name_out', 'move_group_out': 'move_group_out', 'robot_name_out': 'robot_name_out', 'action_topic_out': 'action_topic_out', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:147 y:480
 			OperatableStateMachine.add('MoveToPick',
 										MoveitToJointsDynAriacState(),
-										transitions={'reached': 'Wait', 'planning_failed': 'WaitRetry2', 'control_failed': 'WaitRetry2'},
+										transitions={'reached': 'Wait', 'planning_failed': 'MoveBack', 'control_failed': 'MoveBack'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
 										remapping={'action_topic_namespace': 'action_topic_namespace', 'move_group': 'move_group', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -223,12 +230,6 @@ class pick_part_from_binSM(Behavior):
 			OperatableStateMachine.add('WaitRetry',
 										WaitState(wait_time=1),
 										transitions={'done': 'Move'},
-										autonomy={'done': Autonomy.Off})
-
-			# x:20 y:489
-			OperatableStateMachine.add('WaitRetry2',
-										WaitState(wait_time=1),
-										transitions={'done': 'MoveToPick'},
 										autonomy={'done': Autonomy.Off})
 
 			# x:35 y:302
